@@ -138,4 +138,37 @@ describe("subgraphs", () => {
     );
     prompt.mockRestore();
   });
+
+  test("removes a subgraph while keeping its nodes", () => {
+    const onSubgraphsChange = jest.fn();
+    const { container, getByText } = render(
+      <NodeEditor
+        nodes={exampleNodes}
+        subgraphs={{
+          math: {
+            id: "math",
+            label: "Math",
+            nodeIds: ["5nCLb85WDw", "vRPQ06k4nT"],
+            x: -220,
+            y: -220,
+            width: 500,
+            height: 400
+          }
+        }}
+        nodeTypes={nodeTypes}
+        portTypes={portTypes}
+        onSubgraphsChange={onSubgraphsChange}
+      />
+    );
+
+    fireEvent.contextMenu(
+      container.querySelector('[data-flume-component="subgraph"] .header')
+    );
+    fireEvent.click(getByText("Remove"));
+
+    expect(container.querySelector('[data-flume-component="subgraph"]')).toBeNull();
+    expect(container.querySelector('[data-node-id="5nCLb85WDw"]')).not.toBeNull();
+    expect(container.querySelector('[data-node-id="vRPQ06k4nT"]')).not.toBeNull();
+    expect(onSubgraphsChange).toHaveBeenCalledWith({});
+  });
 });

@@ -11,6 +11,7 @@ interface SubgraphProps {
   stageRect: React.MutableRefObject<DOMRect | undefined>;
   onMove: (delta: Coordinate) => void;
   onRename: (label: string) => void;
+  onRemove: () => void;
 }
 
 const Subgraph = ({
@@ -18,7 +19,8 @@ const Subgraph = ({
   stageState,
   stageRect,
   onMove,
-  onRename
+  onRename,
+  onRemove
 }: SubgraphProps) => {
   const previousCoordinates = React.useRef<Coordinate>();
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -41,6 +43,7 @@ const Subgraph = ({
 
   const handleMenuOption = ({ value }: SelectOption) => {
     if (value === "renameSubgraph") handleRename();
+    if (value === "removeSubgraph") onRemove();
   };
 
   const handleHeaderContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -80,6 +83,11 @@ const Subgraph = ({
                 label: "Rename",
                 value: "renameSubgraph",
                 description: "Change the subgraph title."
+              },
+              {
+                label: "Remove",
+                value: "removeSubgraph",
+                description: "Remove the subgraph and keep its nodes."
               }
             ]}
             onRequestClose={() => setMenuOpen(false)}

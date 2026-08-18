@@ -247,6 +247,14 @@ export let NodeEditor = React.forwardRef(
       });
     }, []);
 
+    const removeSubgraph = React.useCallback((subgraphId: string) => {
+      setSubgraphs(current => {
+        if (!current[subgraphId]) return current;
+        const { [subgraphId]: removedSubgraph, ...remaining } = current;
+        return remaining;
+      });
+    }, []);
+
     React.useImperativeHandle(ref, () => ({
       getNodes: () => {
         return nodes;
@@ -349,6 +357,7 @@ export let NodeEditor = React.forwardRef(
                               stageRect={stage}
                               onMove={delta => moveSubgraph(subgraph.id, delta)}
                               onRename={label => renameSubgraph(subgraph.id, label)}
+                              onRemove={() => removeSubgraph(subgraph.id)}
                             />
                           ))}
                           {!hideComments &&
