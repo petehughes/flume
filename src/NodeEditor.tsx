@@ -255,6 +255,92 @@ export let NodeEditor = React.forwardRef(
       });
     }, []);
 
+    const expandSubgraphToNodes = React.useCallback(
+      (
+        subgraph: SubgraphMap[string],
+        nodePositions: { [nodeId: string]: Coordinate } = {}
+      ) => {
+        const padding = 24;
+        const headerHeight = 24;
+        const memberNodes = subgraph.nodeIds
+          .map(nodeId => nodes[nodeId])
+          .filter(Boolean);
+        if (!memberNodes.length) return subgraph;
+
+        const getPosition = (nodeId: string) =>
+          nodePositions[nodeId] || nodes[nodeId];
+        const minX = Math.min(
+          subgraph.x,
+          ...memberNodes.map(node => getPosition(node.id).x - padding)
+        );
+        const minY = Math.min(
+          subgraph.y,
+          ...memberNodes.map(node => getPosition(node.id).y - padding - headerHeight)
+        );
+        const maxX = Math.max(
+          subgraph.x + subgraph.width,
+          ...memberNodes.map(node => getPosition(node.id).x + node.width + padding)
+        );
+        const maxY = Math.max(
+          subgraph.y + subgraph.height,
+          ...memberNodes.map(node => getPosition(node.id).y + 180 + padding)
+        );
+
+        return {
+          ...subgraph,
+          x: minX,
+          y: minY,
+          width: maxX - minX,
+          height: maxY - minY
+        };
+      },
+      [nodes]
+    );
+
+    const updateNodeSubgraph = React.useCallback(
+      (nodeId: string, coordinates: Coordinate) => {
+        const node = nodes[nodeId];
+        if (!node) return;
+
+        const nodeCenter = {
+          x: coordinates.x + node.width / 2,
+          y: coordinates.y + 90
+        };
+        const destination = Object.values(subgraphs).find(subgraph =>
+          nodeCenter.x >= subgraph.x &&
+          nodeCenter.x <= subgraph.x + subgraph.width &&
+          nodeCenter.y >= subgraph.y &&
+          nodeCenter.y <= subgraph.y + subgraph.height
+        );
+        const currentSubgraph = Object.values(subgraphs).find(subgraph =>
+          subgraph.nodeIds.includes(nodeId)
+        );
+        const targetSubgraph = destination || currentSubgraph;
+        if (!targetSubgraph) return;
+
+        setSubgraphs(current =>
+          Object.values(current).reduce<SubgraphMap>((updated, subgraph) => {
+            const nodeIds = subgraph.nodeIds.filter(id => id !== nodeId);
+            const updatedSubgraph = {
+              ...subgraph,
+              nodeIds:
+                subgraph.id === targetSubgraph.id
+                  ? [...nodeIds, nodeId]
+                  : nodeIds
+            };
+            updated[subgraph.id] =
+              subgraph.id === targetSubgraph.id
+                ? expandSubgraphToNodes(updatedSubgraph, {
+                  [nodeId]: coordinates
+                })
+                : updatedSubgraph;
+            return updated;
+          }, {})
+        );
+      },
+      [expandSubgraphToNodes, nodes, subgraphs]
+    );
+
     React.useImperativeHandle(ref, () => ({
       getNodes: () => {
         return nodes;
@@ -375,6 +461,9 @@ export let NodeEditor = React.forwardRef(
                               {...node}
                               stageRect={stage}
                               onDragStart={recalculateStageRect}
+                              onDragEnd={coordinates =>
+                                updateNodeSubgraph(node.id, coordinates)
+                              }
                               renderNodeHeader={renderNodeHeader}
                               selected={selectedNodeIds.includes(node.id)}
                               onSelect={event => selectNode(node.id, event)}

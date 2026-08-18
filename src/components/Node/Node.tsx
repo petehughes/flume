@@ -31,6 +31,7 @@ interface NodeProps {
   type: string;
   inputData: InputData;
   onDragStart: () => void;
+  onDragEnd?: (coordinates: Coordinate) => void;
   selected?: boolean;
   onSelect?: (event: React.MouseEvent) => void;
   onCreateSubgraph?: () => void;
@@ -49,6 +50,7 @@ const Node = ({
   inputData,
   root,
   onDragStart,
+  onDragEnd,
   selected,
   onSelect,
   onCreateSubgraph,
@@ -158,6 +160,7 @@ const Node = ({
       ...coordinates,
       nodeId: id
     });
+    onDragEnd?.(coordinates);
   };
 
   const handleDrag = ({ x, y }: Coordinate) => {

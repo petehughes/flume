@@ -101,6 +101,44 @@ describe("subgraphs", () => {
     );
   });
 
+  test("expands a subgraph when a member moves outside its bounds", () => {
+    const onSubgraphsChange = jest.fn();
+    const { container } = render(
+      <NodeEditor
+        nodes={exampleNodes}
+        subgraphs={{
+          math: {
+            id: "math",
+            label: "Math",
+            nodeIds: ["5nCLb85WDw"],
+            x: 100,
+            y: -120,
+            width: 200,
+            height: 150
+          }
+        }}
+        nodeTypes={nodeTypes}
+        portTypes={portTypes}
+        onSubgraphsChange={onSubgraphsChange}
+      />
+    );
+    const node = container.querySelector('[data-node-id="5nCLb85WDw"]');
+
+    fireEvent.mouseDown(node, { clientX: 0, clientY: 0 });
+    fireEvent.mouseMove(document, { clientX: 300, clientY: 200 });
+    fireEvent.mouseUp(document, { clientX: 300, clientY: 200 });
+
+    expect(onSubgraphsChange).toHaveBeenLastCalledWith({
+      math: expect.objectContaining({
+        width: expect.any(Number),
+        height: expect.any(Number)
+      })
+    });
+    const updatedSubgraph = onSubgraphsChange.mock.calls.at(-1)[0].math;
+    expect(updatedSubgraph.x + updatedSubgraph.width).toBeGreaterThan(300);
+    expect(updatedSubgraph.y + updatedSubgraph.height).toBeGreaterThan(200);
+  });
+
   test("renames a subgraph from its title context menu", () => {
     const onSubgraphsChange = jest.fn();
     const prompt = jest.spyOn(window, "prompt").mockReturnValue("Renamed Math");
@@ -170,5 +208,52 @@ describe("subgraphs", () => {
     expect(container.querySelector('[data-node-id="5nCLb85WDw"]')).not.toBeNull();
     expect(container.querySelector('[data-node-id="vRPQ06k4nT"]')).not.toBeNull();
     expect(onSubgraphsChange).toHaveBeenCalledWith({});
+  });
+
+  test("moves a dragged node between subgraphs", () => {
+    const onSubgraphsChange = jest.fn();
+    const { container } = render(
+      <NodeEditor
+        nodes={exampleNodes}
+        subgraphs={{
+          source: {
+            id: "source",
+            label: "Source",
+            nodeIds: ["5nCLb85WDw"],
+            x: 100,
+            y: 100,
+            width: 200,
+            height: 200
+          },
+          destination: {
+            id: "destination",
+            label: "Destination",
+            nodeIds: ["vRPQ06k4nT"],
+            x: 300,
+            y: 300,
+            width: 120,
+            height: 150
+          }
+        }}
+        nodeTypes={nodeTypes}
+        portTypes={portTypes}
+        onSubgraphsChange={onSubgraphsChange}
+      />
+    );
+    const node = container.querySelector('[data-node-id="5nCLb85WDw"]');
+
+    fireEvent.mouseDown(node, { clientX: 0, clientY: 0 });
+    fireEvent.mouseMove(document, { clientX: 320, clientY: 320 });
+    fireEvent.mouseUp(document, { clientX: 320, clientY: 320 });
+
+    expect(onSubgraphsChange).toHaveBeenLastCalledWith({
+      source: expect.objectContaining({ nodeIds: [] }),
+      destination: expect.objectContaining({
+        nodeIds: expect.arrayContaining(["5nCLb85WDw", "vRPQ06k4nT"])
+      })
+    });
+    const updatedSubgraphs = onSubgraphsChange.mock.calls.at(-1)[0];
+    expect(updatedSubgraphs.destination.width).toBeGreaterThan(120);
+    expect(updatedSubgraphs.destination.height).toBeGreaterThan(150);
   });
 });
