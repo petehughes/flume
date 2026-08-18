@@ -6,7 +6,8 @@ import {
   ConnectionRecalculateContext,
   StageContext,
   ContextContext,
-  EditorIdContext
+  EditorIdContext,
+  AddNodeMenuContext
 } from "../../context";
 import Control from "../Control/Control";
 import Connection from "../Connection/Connection";
@@ -302,6 +303,7 @@ const Port = ({
   const editorId = React.useContext(EditorIdContext);
   const stageId = `${STAGE_ID}${editorId}`;
   const inputTypes = React.useContext(PortTypesContext) ?? {};
+  const requestAddNodeMenu = React.useContext(AddNodeMenuContext);
   const [isDragging, setIsDragging] = React.useState(false);
   const [dragStartCoordinates, setDragStartCoordinates] = React.useState({
     x: 0,
@@ -390,6 +392,21 @@ const Port = ({
             });
           }
         }
+      } else if (outputNodeId && outputPortName) {
+        requestAddNodeMenu?.({
+          x: e.clientX,
+          y: e.clientY,
+          portType: type,
+          onCreated: (newNodeId, portName) => {
+            nodesDispatch?.({
+              type: NodesActionType.ADD_CONNECTION,
+              input: { nodeId: newNodeId, portName },
+              output: { nodeId: outputNodeId, portName: outputPortName },
+              portType: type
+            });
+            triggerRecalculation();
+          }
+        });
       }
     } else {
       if (droppedOnPort) {
@@ -420,6 +437,21 @@ const Port = ({
             triggerRecalculation();
           }
         }
+      } else {
+        requestAddNodeMenu?.({
+          x: e.clientX,
+          y: e.clientY,
+          portType: type,
+          onCreated: (newNodeId, portName) => {
+            nodesDispatch?.({
+              type: NodesActionType.ADD_CONNECTION,
+              output: { nodeId, portName: name },
+              input: { nodeId: newNodeId, portName },
+              portType: type
+            });
+            triggerRecalculation();
+          }
+        });
       }
     }
     setIsDragging(false);

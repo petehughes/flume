@@ -27,3 +27,5 @@ example/.docz/.cache
 .docz
 cypress/screenshots
 cypress/videos
+
+.playwright-mcp

@@ -1,8 +1,16 @@
 import React, { MouseEventHandler } from "react";
 import styles from "./Stage.css";
 import { Portal } from "react-portal";
+import { nanoid } from "nanoid/non-secure";
 import ContextMenu from "../ContextMenu/ContextMenu";
-import { NodeTypesContext, NodeDispatchContext } from "../../context";
+import {
+  NodeTypesContext,
+  NodeDispatchContext,
+  PortTypesContext,
+  ContextContext,
+  AddNodeMenuContext,
+  AddNodeMenuRequest
+} from "../../context";
 import Draggable from "../Draggable/Draggable";
 import orderBy from "lodash/orderBy";
 import clamp from "lodash/clamp";
@@ -11,6 +19,7 @@ import { NodesActionType } from "../../nodesReducer";
 import { CommentAction, CommentActionTypes } from "../../commentsReducer";
 import {
   Coordinate,
+  NodeType,
   SelectOption,
   StageState,
   StageTranslate
@@ -54,11 +63,17 @@ const Stage = ({
   disableFocusCapture
 }: StageProps) => {
   const nodeTypes = React.useContext(NodeTypesContext);
+  const portTypes = React.useContext(PortTypesContext) ?? {};
+  const context = React.useContext(ContextContext);
   const dispatchNodes = React.useContext(NodeDispatchContext);
   const wrapper = React.useRef<HTMLDivElement>(null);
   const translateWrapper = React.useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [menuCoordinates, setMenuCoordinates] = React.useState({ x: 0, y: 0 });
+  const [connectionRequest, setConnectionRequest] = React.useState<Pick<
+    AddNodeMenuRequest,
+    "portType" | "onCreated"
+  > | null>(null);
   const dragData = React.useRef({ x: 0, y: 0 });
   const [spaceIsPressed, setSpaceIsPressed] = React.useState(false);
 
@@ -200,7 +215,17 @@ const Stage = ({
 
   const closeContextMenu = () => {
     setMenuOpen(false);
+    setConnectionRequest(null);
   };
+
+  const handleAddNodeMenuRequest = React.useCallback(
+    ({ x, y, portType, onCreated }: AddNodeMenuRequest) => {
+      setMenuCoordinates({ x, y });
+      setConnectionRequest({ portType, onCreated });
+      setMenuOpen(true);
+    },
+    []
+  );
 
   const byScale = (value: number) => (1 / scale) * value;
 
@@ -220,15 +245,31 @@ const Stage = ({
           x,
           y
         });
-      } else {
+      } else if (node) {
+        const newNodeId = nanoid(10);
         dispatchNodes?.({
           type: NodesActionType.ADD_NODE,
+          id: newNodeId,
           x,
           y,
-          nodeType: node?.type || ""
+          nodeType: node.type
         });
+        if (connectionRequest) {
+          const inputs = Array.isArray(node.inputs)
+            ? node.inputs
+            : node.inputs({}, { inputs: {}, outputs: {} }, context);
+          const matchingInput = inputs.find(input =>
+            portTypes[input.type]?.acceptTypes?.includes(
+              connectionRequest.portType
+            )
+          );
+          if (matchingInput) {
+            connectionRequest.onCreated(newNodeId, matchingInput.name);
+          }
+        }
       }
     }
+    setConnectionRequest(null);
   };
 
   const handleDocumentKeyUp = (e: KeyboardEvent) => {
@@ -263,10 +304,27 @@ const Stage = ({
     }
   }, [handleWheel, disableZoom]);
 
+  const nodeAcceptsConnection = React.useCallback(
+    (node: NodeType) => {
+      if (!connectionRequest) return true;
+      const inputs = Array.isArray(node.inputs)
+        ? node.inputs
+        : node.inputs({}, { inputs: {}, outputs: {} }, context);
+      return inputs.some(
+        (input: { type: string }) =>
+          portTypes[input.type]?.acceptTypes?.includes(
+            connectionRequest.portType
+          )
+      );
+    },
+    [connectionRequest, portTypes, context]
+  );
+
   const menuOptions = React.useMemo(() => {
     const options: SelectOption[] = orderBy(
       Object.values(nodeTypes || {})
         .filter(node => node.addable !== false)
+        .filter(nodeAcceptsConnection)
         .map(node => ({
           value: node.type,
           label: node.label,
@@ -278,7 +336,7 @@ const Stage = ({
         })),
       ["sortIndex", "label"]
     );
-    if (!disableComments) {
+    if (!disableComments && !connectionRequest) {
       options.push({
         value: "comment",
         label: "Comment",
@@ -287,53 +345,55 @@ const Stage = ({
       });
     }
     return options;
-  }, [nodeTypes, disableComments]);
+  }, [nodeTypes, disableComments, nodeAcceptsConnection, connectionRequest]);
 
   return (
-    <Draggable
-      data-flume-component="stage"
-      id={`${STAGE_ID}${editorId}`}
-      className={styles.wrapper}
-      innerRef={wrapper}
-      onContextMenu={handleContextMenu}
-      onMouseEnter={handleMouseEnter}
-      onDragDelayStart={handleDragDelayStart}
-      onDragStart={handleDragStart}
-      onDrag={handleMouseDrag}
-      onDragEnd={handleDragEnd}
-      onKeyDown={handleKeyDown}
-      tabIndex={-1}
-      stageState={{ scale, translate }}
-      style={{ cursor: spaceIsPressed && spaceToPan ? "grab" : "" }}
-      disabled={disablePan || (spaceToPan && !spaceIsPressed)}
-      data-flume-stage={true}
-    >
-      {menuOpen ? (
-        <Portal>
-          <ContextMenu
-            x={menuCoordinates.x}
-            y={menuCoordinates.y}
-            options={menuOptions}
-            onRequestClose={closeContextMenu}
-            onOptionSelected={addNode}
-            label="Add Node"
-          />
-        </Portal>
-      ) : null}
-      <div
-        ref={translateWrapper}
-        className={styles.transformWrapper}
-        style={{ transform: `translate(${-translate.x}px, ${-translate.y}px)` }}
+    <AddNodeMenuContext.Provider value={handleAddNodeMenuRequest}>
+      <Draggable
+        data-flume-component="stage"
+        id={`${STAGE_ID}${editorId}`}
+        className={styles.wrapper}
+        innerRef={wrapper}
+        onContextMenu={handleContextMenu}
+        onMouseEnter={handleMouseEnter}
+        onDragDelayStart={handleDragDelayStart}
+        onDragStart={handleDragStart}
+        onDrag={handleMouseDrag}
+        onDragEnd={handleDragEnd}
+        onKeyDown={handleKeyDown}
+        tabIndex={-1}
+        stageState={{ scale, translate }}
+        style={{ cursor: spaceIsPressed && spaceToPan ? "grab" : "" }}
+        disabled={disablePan || (spaceToPan && !spaceIsPressed)}
+        data-flume-stage={true}
       >
+        {menuOpen ? (
+          <Portal>
+            <ContextMenu
+              x={menuCoordinates.x}
+              y={menuCoordinates.y}
+              options={menuOptions}
+              onRequestClose={closeContextMenu}
+              onOptionSelected={addNode}
+              label="Add Node"
+            />
+          </Portal>
+        ) : null}
         <div
-          className={styles.scaleWrapper}
-          style={{ transform: `scale(${scale})` }}
+          ref={translateWrapper}
+          className={styles.transformWrapper}
+          style={{ transform: `translate(${-translate.x}px, ${-translate.y}px)` }}
         >
-          {children}
+          <div
+            className={styles.scaleWrapper}
+            style={{ transform: `scale(${scale})` }}
+          >
+            {children}
+          </div>
         </div>
-      </div>
-      {outerStageChildren}
-    </Draggable>
+        {outerStageChildren}
+      </Draggable>
+    </AddNodeMenuContext.Provider>
   );
 };
 export default Stage;

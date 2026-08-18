@@ -20,3 +20,14 @@ export const RecalculateStageRectContext = React.createContext<
   null | (() => void)
 >(null);
 export const EditorIdContext = React.createContext<string>("");
+
+export interface AddNodeMenuRequest {
+  x: number;
+  y: number;
+  portType: string;
+  onCreated: (nodeId: string, portName: string) => void;
+}
+// Lets a port request the "Add Node" menu (filtered to nodes with a matching input) when a connection is dropped on empty stage space.
+export const AddNodeMenuContext = React.createContext<
+  ((request: AddNodeMenuRequest) => void) | null
+>(null);
