@@ -10,6 +10,7 @@ import {
   Connection,
   ConnectionMap,
   Connections,
+  Coordinate,
   DefaultNode,
   FlumeNode,
   InputData,
@@ -31,7 +32,8 @@ export enum NodesActionType {
   REMOVE_NODE = "REMOVE_NODE",
   HYDRATE_DEFAULT_NODES = "HYDRATE_DEFAULT_NODES",
   SET_PORT_DATA = "SET_PORT_DATA",
-  SET_NODE_COORDINATES = "SET_NODE_COORDINATES"
+  SET_NODE_COORDINATES = "SET_NODE_COORDINATES",
+  MOVE_SUBGRAPH = "MOVE_SUBGRAPH"
 }
 
 const addConnection = (nodes: NodeMap, input: ProposedConnection, output: ProposedConnection, portType: string) => {
@@ -331,6 +333,11 @@ export type NodesAction =
     x: number;
     y: number;
     nodeId: string;
+  }
+  | {
+    type: NodesActionType.MOVE_SUBGRAPH;
+    nodeIds: string[];
+    delta: Coordinate;
   };
 
 interface FlumeEnvironment {
@@ -501,6 +508,17 @@ const nodesReducer = (
           y
         }
       };
+    }
+
+    case NodesActionType.MOVE_SUBGRAPH: {
+      const { nodeIds, delta } = action;
+      const movedNodeIds = new Set(nodeIds);
+      return Object.values(nodes).reduce<NodeMap>((newNodes, node) => {
+        newNodes[node.id] = movedNodeIds.has(node.id)
+          ? { ...node, x: node.x + delta.x, y: node.y + delta.y }
+          : node;
+        return newNodes;
+      }, {});
     }
 
     default:

@@ -11,6 +11,11 @@
   z-index: 1;
   cursor: default;
 }
+
+.wrapper[data-selected="true"] {
+  box-shadow: 0px 0px 0px 2px #f1c75b, 0px 4px 8px rgba(0, 0, 0, 0.4);
+}
+
 .label {
   font-size: 13px;
   text-transform: uppercase;

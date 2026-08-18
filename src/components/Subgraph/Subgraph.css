@@ -1,0 +1,25 @@
+.wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  box-sizing: border-box;
+  border: 1px solid rgba(90, 170, 190, 0.75);
+  border-radius: 6px;
+  background: rgba(90, 170, 190, 0.12);
+  user-select: none;
+}
+
+.header {
+  height: 24px;
+  box-sizing: border-box;
+  padding: 4px 8px;
+  overflow: hidden;
+  color: #d9f4f7;
+  background: rgba(50, 115, 130, 0.85);
+  border-radius: 5px 5px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  text-transform: uppercase;
+}

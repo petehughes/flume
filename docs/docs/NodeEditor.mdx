@@ -58,6 +58,28 @@ Optional. This function will be called any time any of the comments in the node 
 For performance reasons, this function will **not** be called while the user is dragging or resizing a comment. As soon as the user releases a dragged comment, this function will be called with the updated comment.
 :::
 
+### `subgraphs` : object
+
+Optional. Defines labeled groups of nodes. Each subgraph must include an `id`, `label`, `nodeIds`, `x`, `y`, `width`, and `height`. Hold `Shift` while clicking nodes to select multiple nodes, then open a selected node's context menu and choose **Create Subgraph**. The subgraph header can be dragged to move all of its member nodes together.
+
+```jsx
+const subgraphs = {
+	math: {
+		id: "math",
+		label: "Math",
+		nodeIds: ["first-number", "second-number", "sum"],
+		x: -220,
+		y: -160,
+		width: 500,
+		height: 300
+	}
+};
+```
+
+### `onSubgraphsChange` : function
+
+Optional. Called after a subgraph is moved with the updated subgraph map. Persist both this value and the node map supplied to `onChange` to restore the complete layout.
+
 ### `context` : object
 
 Optional. Context is used to pass data to the node editor if your nodes require live data. For example, you may have a node with a dropdown control for selecting a color, but the available colors depend on the state of your app. To allow this kind of calculation, the context object is provided to your node at runtime to aid in these kinds of calculations.

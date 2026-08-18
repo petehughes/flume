@@ -1,7 +1,9 @@
 import React from "react";
 import { useId } from "@reach/auto-id";
+import { nanoid } from "nanoid/non-secure";
 import Stage from "./components/Stage/Stage";
 import Node from "./components/Node/Node";
+import Subgraph from "./components/Subgraph/Subgraph";
 import Comment from "./components/Comment/Comment";
 import Toaster from "./components/Toaster/Toaster";
 import Connections from "./components/Connections/Connections";
@@ -38,6 +40,8 @@ import {
   NodeMap,
   NodeTypeMap,
   PortTypeMap,
+  SubgraphMap,
+  Coordinate,
 } from "./types";
 
 const defaultContext = {};
@@ -45,6 +49,8 @@ const defaultContext = {};
 interface NodeEditorProps {
   comments?: FlumeCommentMap;
   nodes?: NodeMap;
+  subgraphs?: SubgraphMap;
+  onSubgraphsChange?: (subgraphs: SubgraphMap) => void;
   nodeTypes: NodeTypeMap;
   portTypes: PortTypeMap;
   defaultNodes?: DefaultNode[];
@@ -68,6 +74,8 @@ export let NodeEditor = React.forwardRef(
     {
       comments: initialComments,
       nodes: initialNodes,
+      subgraphs: initialSubgraphs,
+      onSubgraphsChange,
       nodeTypes = {},
       portTypes = {},
       defaultNodes = [],
@@ -110,6 +118,10 @@ export let NodeEditor = React.forwardRef(
           context
         )
     );
+    const [subgraphs, setSubgraphs] = React.useState<SubgraphMap>(
+      initialSubgraphs || {}
+    );
+    const [selectedNodeIds, setSelectedNodeIds] = React.useState<string[]>([]);
 
     const [comments, dispatchComments] = React.useReducer(
       commentsReducer,
@@ -119,6 +131,53 @@ export let NodeEditor = React.forwardRef(
     React.useEffect(() => {
       dispatchNodes({ type: NodesActionType.HYDRATE_DEFAULT_NODES });
     }, []);
+
+    const previousSubgraphs = usePrevious(subgraphs);
+
+    React.useEffect(() => {
+      if (previousSubgraphs && onSubgraphsChange && subgraphs !== previousSubgraphs) {
+        onSubgraphsChange(subgraphs);
+      }
+    }, [subgraphs, previousSubgraphs, onSubgraphsChange]);
+
+    const selectNode = React.useCallback((nodeId: string, event: React.MouseEvent) => {
+      const additive = event.shiftKey || event.ctrlKey || event.metaKey;
+      setSelectedNodeIds(current =>
+        additive
+          ? current.includes(nodeId)
+            ? current.filter(id => id !== nodeId)
+            : [...current, nodeId]
+          : [nodeId]
+      );
+    }, []);
+
+    const createSubgraph = React.useCallback(() => {
+      const selectedNodes = selectedNodeIds
+        .map(nodeId => nodes[nodeId])
+        .filter(Boolean);
+      if (selectedNodes.length < 2) return;
+
+      const padding = 24;
+      const headerHeight = 24;
+      const minX = Math.min(...selectedNodes.map(node => node.x)) - padding;
+      const minY = Math.min(...selectedNodes.map(node => node.y)) - padding - headerHeight;
+      const maxX = Math.max(...selectedNodes.map(node => node.x + node.width)) + padding;
+      const maxY = Math.max(...selectedNodes.map(node => node.y + 180)) + padding;
+      const id = `subgraph-${nanoid(6)}`;
+      setSubgraphs(current => ({
+        ...current,
+        [id]: {
+          id,
+          label: "Subgraph",
+          nodeIds: selectedNodes.map(node => node.id),
+          x: minX,
+          y: minY,
+          width: maxX - minX,
+          height: maxY - minY
+        }
+      }));
+      setSelectedNodeIds([]);
+    }, [nodes, selectedNodeIds]);
 
     const [
       shouldRecalculateConnections,
@@ -149,6 +208,43 @@ export let NodeEditor = React.forwardRef(
 
     const triggerRecalculation = React.useCallback(() => {
       setShouldRecalculateConnections(true);
+    }, []);
+
+    const moveSubgraph = React.useCallback(
+      (subgraphId: string, delta: Coordinate) => {
+        const subgraph = subgraphs[subgraphId];
+        if (!subgraph) return;
+        dispatchNodes({
+          type: NodesActionType.MOVE_SUBGRAPH,
+          nodeIds: subgraph.nodeIds,
+          delta
+        });
+        setSubgraphs(current => {
+          const currentSubgraph = current[subgraphId];
+          if (!currentSubgraph) return current;
+          return {
+            ...current,
+            [subgraphId]: {
+              ...currentSubgraph,
+              x: currentSubgraph.x + delta.x,
+              y: currentSubgraph.y + delta.y
+            }
+          };
+        });
+        triggerRecalculation();
+      },
+      [subgraphs, triggerRecalculation]
+    );
+
+    const renameSubgraph = React.useCallback((subgraphId: string, label: string) => {
+      setSubgraphs(current => {
+        const subgraph = current[subgraphId];
+        if (!subgraph) return current;
+        return {
+          ...current,
+          [subgraphId]: { ...subgraph, label }
+        };
+      });
     }, []);
 
     React.useImperativeHandle(ref, () => ({
@@ -245,6 +341,16 @@ export let NodeEditor = React.forwardRef(
                             </React.Fragment>
                           }
                         >
+                          {Object.values(subgraphs).map(subgraph => (
+                            <Subgraph
+                              key={subgraph.id}
+                              subgraph={subgraph}
+                              stageState={stageState}
+                              stageRect={stage}
+                              onMove={delta => moveSubgraph(subgraph.id, delta)}
+                              onRename={label => renameSubgraph(subgraph.id, label)}
+                            />
+                          ))}
                           {!hideComments &&
                             Object.values(comments).map(comment => (
                               <Comment
@@ -261,6 +367,14 @@ export let NodeEditor = React.forwardRef(
                               stageRect={stage}
                               onDragStart={recalculateStageRect}
                               renderNodeHeader={renderNodeHeader}
+                              selected={selectedNodeIds.includes(node.id)}
+                              onSelect={event => selectNode(node.id, event)}
+                              onCreateSubgraph={
+                                selectedNodeIds.length > 1 &&
+                                  selectedNodeIds.includes(node.id)
+                                  ? createSubgraph
+                                  : undefined
+                              }
                               key={node.id}
                             />
                           ))}

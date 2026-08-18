@@ -31,6 +31,9 @@ interface NodeProps {
   type: string;
   inputData: InputData;
   onDragStart: () => void;
+  selected?: boolean;
+  onSelect?: (event: React.MouseEvent) => void;
+  onCreateSubgraph?: () => void;
   renderNodeHeader?: NodeHeaderRenderCallback;
   root?: boolean;
 }
@@ -46,6 +49,9 @@ const Node = ({
   inputData,
   root,
   onDragStart,
+  selected,
+  onSelect,
+  onCreateSubgraph,
   renderNodeHeader
 }: NodeProps) => {
   const cache = React.useContext(CacheContext) ?? undefined;
@@ -168,6 +174,7 @@ const Node = ({
   const handleContextMenu = (e: MouseEvent | React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (onSelect && !selected) onSelect(e as React.MouseEvent);
     setMenuCoordinates({ x: e.clientX, y: e.clientY });
     setMenuOpen(true);
     return false;
@@ -189,6 +196,9 @@ const Node = ({
       case "deleteNode":
         deleteNode();
         break;
+      case "createSubgraph":
+        onCreateSubgraph?.();
+        break;
       default:
         return;
     }
@@ -197,6 +207,7 @@ const Node = ({
   return (
     <Draggable
       className={styles.wrapper}
+      data-selected={selected || undefined}
       style={{
         width,
         transform: `translate(${x}px, ${y}px)`
@@ -210,6 +221,7 @@ const Node = ({
       data-flume-node-type={currentNodeType.type}
       data-flume-component-is-root={!!root}
       onContextMenu={handleContextMenu}
+      onMouseDown={e => onSelect?.(e)}
       stageState={stageState}
       stageRect={stageRect}
     >
@@ -236,6 +248,15 @@ const Node = ({
             x={menuCoordinates.x}
             y={menuCoordinates.y}
             options={[
+              ...(onCreateSubgraph
+                ? [
+                  {
+                    label: "Create Subgraph",
+                    value: "createSubgraph",
+                    description: "Groups the selected nodes into a subgraph."
+                  }
+                ]
+                : []),
               ...(deletable !== false
                 ? [
                   {

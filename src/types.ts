@@ -310,6 +310,18 @@ export type DefaultNode = {
 
 export type NodeMap = { [nodeId: string]: FlumeNode };
 
+export type FlumeSubgraph = {
+  id: string;
+  label: string;
+  nodeIds: string[];
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type SubgraphMap = { [subgraphId: string]: FlumeSubgraph };
+
 export type ToastTypes = "danger" | "info" | "success" | "warning";
 
 export type Toast = {
