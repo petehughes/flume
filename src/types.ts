@@ -33,6 +33,8 @@ export interface SelectOption {
   sortIndex?: number;
   node?: NodeType;
   internalType?: "comment";
+  keywords?: string[];
+  group?: string;
 }
 
 export interface SelectControl extends GenericControl {
@@ -191,6 +193,8 @@ export interface NodeType {
   initialWidth?: number;
   sortIndex?: number;
   root?: boolean;
+  group?:string
+  keywords?: string[];
 }
 
 export type NodeTypeMap = { [nodeType: string]: NodeType };
@@ -268,6 +272,8 @@ export interface NodeTypeConfig
   | ((ports: {
     [portType: string]: PortTypeBuilder;
   }) => DynamicPortTypeBuilder);
+  group?:string
+  keywords?: string[];
 }
 
 export type Connection = {

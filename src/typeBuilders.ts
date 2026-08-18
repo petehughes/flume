@@ -223,7 +223,7 @@ export class FlumeConfig {
       label: define(config.label, ""),
       description: define(config.description, ""),
       addable: define(config.addable, true),
-      deletable: define(config.deletable, true)
+      deletable: define(config.deletable, true),
     };
     if (config.initialWidth) {
       node.initialWidth = config.initialWidth;
@@ -231,6 +231,13 @@ export class FlumeConfig {
     if (config.sortIndex !== undefined) {
       node.sortIndex = config.sortIndex;
     }
+    if(config.group !== undefined) {
+      node.group = config.group;
+    }
+    if(config.keywords !== undefined) {
+      node.keywords = config.keywords;
+    }
+
     if (typeof config.inputs === "function") {
       const inputs = config.inputs(getPortBuilders(this.portTypes));
       if (!Array.isArray(inputs) && typeof config.inputs !== "function") {

@@ -272,7 +272,9 @@ const Stage = ({
           label: node.label,
           description: node.description,
           sortIndex: node.sortIndex,
-          node
+          node,
+          keywords: node.keywords,
+          group: node.group
         })),
       ["sortIndex", "label"]
     );

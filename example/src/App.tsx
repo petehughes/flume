@@ -297,7 +297,8 @@ flumeConfig
     description: "Outputs a boolean value",
     initialWidth: 150,
     inputs: ports => [ports.boolean()],
-    outputs: ports => [ports.boolean()]
+    outputs: ports => [ports.boolean()],
+    keywords: ["true", "false", "boolean", "yes", "no"]
   })
   .addNodeType({
     type: "text",
@@ -574,14 +575,15 @@ flumeConfig
     type: "switch",
     label: "Switch",
     description: "Switches between two values based on a boolean",
+    group: "logic",
     inputs: ports => (data, connections) => {
       let value1Type = (connections.inputs.value1 || [{ portName: 'any' }])[0]?.portType
       let port = ports[value1Type] || ports.any;
 
       return [
         ports.boolean({ name: "condition", label: "Condition" }),
-        port({ name: "value1", label: "Value 1" }),
-        port({ name: "value2", label: "Value 2" })
+        port({ name: "value1", label: "True Value" }),
+        port({ name: "value2", label: "False Value" })
       ];
     },
     outputs: ports =>
@@ -599,12 +601,13 @@ flumeConfig
     description: "Outputs if value1 equals value2.",
     initialWidth: 170,
     sortIndex: 33,
+    group: "logic",
     inputs: ports => (data, connections) => {
       let value1Type = (connections.inputs.value1 || [{ portName: 'any' }])[0]?.portType
       let port = ports[value1Type] || ports.any;
 
       return [
-        port({ name: "value1", label: "Value 1" }),
+        port({ name: "value1", label: "Value Trye" }),
         port({ name: "value2", label: "Value 2" }),
         value1Type === 'text' ? ports.boolean({ name: "caseSensitive", label: "Case Sensitive" }) : null,
         value1Type === 'number' ? ports.boolean({ name: "abs", label: "Absolute Value" }) : null,
@@ -618,6 +621,7 @@ flumeConfig
     description: "Select a single item from a list.",
     initialWidth: 170,
     sortIndex: 33,
+    group: "logic",
     inputs: ports => (data, connections) => {
       let value1Type = (connections.inputs.item0 || [{ portName: 'any' }])[0]?.portType
       let port = ports[value1Type] || ports.any;
