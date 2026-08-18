@@ -288,10 +288,15 @@ type ProposedConnection = { nodeId: string; portName: string };
 
 export type NodesAction =
   | {
-    type: NodesActionType.ADD_CONNECTION | NodesActionType.REMOVE_CONNECTION;
+    type: NodesActionType.ADD_CONNECTION;
     input: ProposedConnection;
     output: ProposedConnection;
     portType: string;
+  }
+   | {
+    type: NodesActionType.REMOVE_CONNECTION;
+    input: ProposedConnection;
+    output: ProposedConnection;
   }
   | {
     type: NodesActionType.DESTROY_TRANSPUT;
