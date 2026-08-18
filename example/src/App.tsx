@@ -245,7 +245,8 @@ flumeConfig
     description: "Outputs a number",
     initialWidth: 150,
     inputs: ports => [ports.number()],
-    outputs: ports => [ports.number()]
+    outputs: ports => [ports.number()],
+    group: "maths"
   })
   .addNodeType({
     type: "addNumbers",
@@ -254,9 +255,11 @@ flumeConfig
     initialWidth: 150,
     inputs: ports => [
       ports.number({ name: "num1" }),
-      ports.number({ name: "num2" })
+      ports.number({ name: "num2" }),
     ],
-    outputs: ports => [ports.number({ name: "result" })]
+    outputs: ports => [ports.number({ name: "result" })],
+    group: "maths"
+
   })
   .addNodeType({
     type: "subtractNumbers",
@@ -267,7 +270,8 @@ flumeConfig
       ports.number({ name: "num1" }),
       ports.number({ name: "num2" })
     ],
-    outputs: ports => [ports.number({ name: "result" })]
+    outputs: ports => [ports.number({ name: "result" })],
+    group: "maths"
   })
   .addNodeType({
     type: "divideNumbers",
@@ -278,7 +282,8 @@ flumeConfig
       ports.number({ name: "num1" }),
       ports.number({ name: "num2" })
     ],
-    outputs: ports => [ports.number({ name: "result" })]
+    outputs: ports => [ports.number({ name: "result" })],
+    group: "maths"
   })
   .addNodeType({
     type: "multiplyNumbers",
@@ -289,7 +294,8 @@ flumeConfig
       ports.number({ name: "num1" }),
       ports.number({ name: "num2" })
     ],
-    outputs: ports => [ports.number({ name: "result" })]
+    outputs: ports => [ports.number({ name: "result" })],
+    group: "maths"
   })
   .addNodeType({
     type: "boolean",
@@ -298,7 +304,8 @@ flumeConfig
     initialWidth: 150,
     inputs: ports => [ports.boolean()],
     outputs: ports => [ports.boolean()],
-    keywords: ["true", "false", "boolean", "yes", "no"]
+    keywords: ["true", "false", "boolean", "yes", "no"],
+    group: "logic"
   })
   .addNodeType({
     type: "text",
@@ -307,6 +314,8 @@ flumeConfig
     initialWidth: 170,
     inputs: ports => [ports.text()],
     outputs: ports => [ports.text()]
+    ,
+    group: "text"
   })
   .addNodeType({
     type: "user",
@@ -341,7 +350,8 @@ flumeConfig
       ports.text({ name: "string1", label: "First half" }),
       ports.text({ name: "string2", label: "Second half" })
     ],
-    outputs: ports => [ports.text({ name: "result", label: "Joined Text" })]
+    outputs: ports => [ports.text({ name: "result", label: "Joined Text" })],
+    group: "text"
   })
   .addNodeType({
     type: "and",
@@ -352,7 +362,8 @@ flumeConfig
       ports.boolean({ name: "bool1" }),
       ports.boolean({ name: "bool2" })
     ],
-    outputs: ports => [ports.boolean({ name: "result" })]
+    outputs: ports => [ports.boolean({ name: "result" })],
+    group: "logic"
   })
   .addNodeType({
     type: "or",
@@ -363,7 +374,9 @@ flumeConfig
       ports.boolean({ name: "bool1" }),
       ports.boolean({ name: "bool2" })
     ],
-    outputs: ports => [ports.boolean({ name: "result" })]
+    outputs: ports => [ports.boolean({ name: "result" })],
+    group: "logic"
+
   })
   .addNodeType({
     type: "car",
@@ -376,6 +389,8 @@ flumeConfig
       ports.number({ name: "year", label: "Year" })
     ],
     outputs: ports => [ports.car({ name: "car" })]
+    ,
+    group: "cars"
   })
   .addNodeType({
     type: "combineCars",
@@ -393,7 +408,8 @@ flumeConfig
       ports.car({ name: "car8" }),
       ports.car({ name: "car9" }),
       ports.car({ name: "car10" })
-    ]
+    ],
+    group: "cars"
   })
   .addNodeType({
     type: "shader",

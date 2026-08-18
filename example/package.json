@@ -15,7 +15,7 @@
     "docz": "^2.3.1",
     "local-storage": "^2.0.0",
     "nanoid": "^2.1.11",
-    "node-editor": "link:..",
+    "node-editor": "link:../src",
     "normalize.css": "^8.0.1",
     "prop-types": "^15.6.2",
     "react": "link:../node_modules/react",

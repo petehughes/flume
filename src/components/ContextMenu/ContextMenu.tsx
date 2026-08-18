@@ -384,6 +384,7 @@ const ContextMenu = ({
             className={styles.submenu}
             data-flume-component="ctx-menu-submenu"
             role="menu"
+            onMouseDown={e => e.stopPropagation()}
             onMouseEnter={() => setOpenGroup(openGroupItem.group)}
             style={{ top: submenuPosition.top, left: submenuPosition.left }}
           >
