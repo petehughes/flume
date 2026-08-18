@@ -237,6 +237,9 @@ export class FlumeConfig {
     if(config.keywords !== undefined) {
       node.keywords = config.keywords;
     }
+    if (config.mermaidShape !== undefined) {
+      node.mermaidShape = config.mermaidShape;
+    }
 
     if (typeof config.inputs === "function") {
       const inputs = config.inputs(getPortBuilders(this.portTypes));

@@ -6,7 +6,8 @@ import {
   Controls,
   Colors,
   RootEngine,
-  useRootEngine,
+  nodeMapToMermaid,
+  mermaidToNodeMap,
   NodeMap
 } from "node-editor";
 
@@ -629,7 +630,8 @@ flumeConfig
         value1Type === 'number' ? ports.boolean({ name: "abs", label: "Absolute Value" }) : null,
       ].filter(t => t !== null);
     },
-    outputs: ports => [ports.boolean({ name: "result" })]
+    outputs: ports => [ports.boolean({ name: "result" })],
+    mermaidShape: "diamond"
   })
   .addNodeType({
     type: "index",
@@ -697,9 +699,22 @@ const engine = new RootEngine(
 const App = () => {
   const [nodes, setNodes] = React.useState({});
   const [comments, setComments] = React.useState({});
+  const [editorKey, setEditorKey] = React.useState(0);
   return (
     <div className="wrapper" style={{ lineHeight: 1.8 }}>
+      <button
+        onClick={() => {
+          var output = prompt("Copy the following Mermaid code:", nodeMapToMermaid(nodes, flumeConfig));
+          if (!!output) {
+            setNodes(mermaidToNodeMap(output));
+            setEditorKey(key => key + 1);
+          }
+        }}
+      >
+        Import / Export To Mermaid
+      </button>
       <NodeEditor
+        key={editorKey}
         portTypes={flumeConfig.portTypes}
         nodeTypes={flumeConfig.nodeTypes}
         nodes={nodes}
@@ -738,12 +753,11 @@ const App = () => {
             </Wrapper>
           );
         }}
-        debug
       />
       <div style={{ marginTop: 30 }}>
         <Website nodes={nodes} />
       </div>
-    </div>
+    </div >
   );
 };
 

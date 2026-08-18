@@ -195,6 +195,7 @@ export interface NodeType {
   root?: boolean;
   group?:string
   keywords?: string[];
+  mermaidShape?: string;
 }
 
 export type NodeTypeMap = { [nodeType: string]: NodeType };
