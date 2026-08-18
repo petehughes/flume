@@ -574,6 +574,50 @@ flumeConfig
     outputs: ports => [ports.employeeType()]
   });
 
+flumeConfig
+  .addPortType({
+    type: "any",
+    name: "Any",
+    label: "Any type",
+    color: Colors.blue,
+    controls: [
+      Controls.custom({
+        name: "unknown",
+        render: (_, $, $$, $$$, $$$$, inputData) => {
+          return (
+            <div />
+          );
+        }
+      })
+    ],
+    acceptTypes: Object.keys(flumeConfig.portTypes)
+
+  })
+  .addNodeType({
+    type: "switch",
+    label: "Switch",
+    description: "Switches between two values based on a boolean",
+    inputs: ports => (data, connections) => {
+      let value1Type = (connections.inputs.value1 || [{ portName: 'any' }])[0]?.portName
+      let port = ports[value1Type] || ports.any;
+
+      return [
+        ports.boolean({ name: "condition", label: "Condition" }),
+        port({ name: "value1", label: "Value 1" }),
+        port({ name: "value2", label: "Value 2" })
+      ];
+    },
+    outputs: ports =>
+      (data, connections) => {
+        let value1Type = (connections.inputs.value1 || [{ portName: 'any' }])[0]?.portName
+        let port = ports[value1Type] || ports.any;
+        return [
+          port({ name: "result", label: "Result" })
+        ];
+      }
+  })
+  ;
+
 const engine = new RootEngine(
   flumeConfig,
   (type, data) => {
