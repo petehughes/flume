@@ -29,3 +29,5 @@ cypress/screenshots
 cypress/videos
 
 .playwright-mcp
+*.lock
+*-lock.*

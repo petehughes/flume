@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./ColorPicker.css";
+import styles from "./ColorPicker.module.css";
 import { Colors } from "../../typeBuilders";
 import { Colors as ColorsType } from "../../types";
 

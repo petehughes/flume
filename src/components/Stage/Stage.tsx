@@ -1,5 +1,5 @@
 import React, { MouseEventHandler } from "react";
-import styles from "./Stage.css";
+import styles from "./Stage.module.css";
 import { Portal } from "react-portal";
 import { nanoid } from "nanoid/non-secure";
 import ContextMenu from "../ContextMenu/ContextMenu";

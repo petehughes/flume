@@ -1,6 +1,6 @@
 import React from "react";
 import { Portal } from "react-portal";
-import styles from "./Subgraph.css";
+import styles from "./Subgraph.module.css";
 import Draggable from "../Draggable/Draggable";
 import ContextMenu from "../ContextMenu/ContextMenu";
 import { Coordinate, FlumeSubgraph, SelectOption, StageState } from "../../types";

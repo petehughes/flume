@@ -1,7 +1,7 @@
 import React from "react";
 import { ToastAction, ToastActionTypes } from "../../toastsReducer";
 import { Toast as ToastType } from "../../types";
-import styles from "./Toaster.css";
+import styles from "./Toaster.module.css";
 
 type ToasterProps = {
   toasts: ToastType[];
@@ -86,7 +86,7 @@ const Toast = ({
 }: ToastProps) => {
   const [paused, setPaused] = React.useState(false);
   const wrapper = React.useRef<HTMLDivElement>(null);
-  const timer = React.useRef<NodeJS.Timeout>();
+  const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const stopTimer = React.useCallback(() => {
     setPaused(true);
