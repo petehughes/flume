@@ -1,12 +1,12 @@
-const path = require('path')
-const { defineConfig } = require('vite')
+const path = require("path");
+const { defineConfig } = require("vite");
 
 module.exports = defineConfig({
-  build: {
-    lib: {
-      entry: path.resolve(__dirname, 'src/index.js'),
-      name: 'Flume',
-      fileName: (format) => `index.${format}.js`
-    }
-  }
+	build: {
+		lib: {
+			entry: path.resolve(__dirname, "src/index.js"),
+			name: "Flume",
+			fileName: (format) => `index.${format}.js`,
+		},
+	},
 });
