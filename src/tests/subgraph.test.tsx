@@ -150,6 +150,30 @@ describe("subgraphs", () => {
 		expect(updatedSubgraph.y + updatedSubgraph.height).toBeGreaterThan(200);
 	});
 
+	test("renames a node from its context menu", () => {
+		const prompt = vi.spyOn(window, "prompt").mockReturnValue("Renamed Number");
+		const { container, getByText } = render(
+			<NodeEditor
+				nodes={exampleNodes}
+				nodeTypes={nodeTypes}
+				portTypes={portTypes}
+			/>,
+		);
+
+		const node = container.querySelector('[data-node-id="5nCLb85WDw"]');
+		const header = node?.querySelector('[data-flume-component="node-header"]');
+
+		expect(node).not.toBeNull();
+		expect(header).not.toBeNull();
+
+		fireEvent.contextMenu(node!);
+		fireEvent.click(getByText("Rename Node"));
+
+		expect(prompt).toHaveBeenCalledWith("Rename node", "Add Numbers");
+		expect(header!.textContent).toBe("Renamed Number");
+		prompt.mockRestore();
+	});
+
 	test("renames a subgraph from its title context menu", () => {
 		const onSubgraphsChange = vi.fn();
 		const prompt = vi.spyOn(window, "prompt").mockReturnValue("Renamed Math");

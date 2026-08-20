@@ -23,6 +23,7 @@ import styles from "./Node.module.css";
 
 interface NodeProps {
 	id: string;
+	label?: string;
 	width: number;
 	x: number;
 	y: number;
@@ -47,6 +48,7 @@ const Node = ({
 	stageRect,
 	connections,
 	type,
+	label,
 	inputData,
 	root,
 	onDragStart,
@@ -64,7 +66,9 @@ const Node = ({
 		translate: { x: 0, y: 0 },
 	};
 	const currentNodeType = nodeTypes[type];
-	const { label, deletable, inputs = [], outputs = [] } = currentNodeType;
+	const { label: defaultLabel, deletable, inputs = [], outputs = [] } =
+		currentNodeType;
+	const nodeLabel = label ?? defaultLabel;
 
 	const nodeWrapper = React.useRef<HTMLDivElement>(null);
 	const [menuOpen, setMenuOpen] = React.useState(false);
@@ -197,8 +201,23 @@ const Node = ({
 		});
 	};
 
+	const renameNode = () => {
+		const nextLabel = window.prompt("Rename node", nodeLabel);
+		if (nextLabel === null) return;
+		const trimmed = nextLabel.trim();
+		if (!trimmed) return;
+		nodesDispatch?.({
+			type: NodesActionType.RENAME_NODE,
+			nodeId: id,
+			label: trimmed,
+		});
+	};
+
 	const handleMenuOption = ({ value }: SelectOption) => {
 		switch (value) {
+			case "renameNode":
+				renameNode();
+				break;
 			case "deleteNode":
 				deleteNode();
 				break;
@@ -235,10 +254,11 @@ const Node = ({
 				renderNodeHeader(NodeHeader, currentNodeType, {
 					openMenu: handleContextMenu,
 					closeMenu: closeContextMenu,
+					renameNode,
 					deleteNode,
-				})
+				}, nodeLabel)
 			) : (
-				<NodeHeader>{label}</NodeHeader>
+				<NodeHeader>{nodeLabel}</NodeHeader>
 			)}
 			<IoPorts
 				nodeId={id}
@@ -254,6 +274,11 @@ const Node = ({
 						x={menuCoordinates.x}
 						y={menuCoordinates.y}
 						options={[
+							{
+								label: "Rename Node",
+								value: "renameNode",
+								description: "Change the node title.",
+							},
 							...(onCreateSubgraph
 								? [
 										{

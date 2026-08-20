@@ -30,6 +30,7 @@ export enum NodesActionType {
 	DESTROY_TRANSPUT = "DESTROY_TRANSPUT",
 	ADD_NODE = "ADD_NODE",
 	REMOVE_NODE = "REMOVE_NODE",
+	RENAME_NODE = "RENAME_NODE",
 	HYDRATE_DEFAULT_NODES = "HYDRATE_DEFAULT_NODES",
 	SET_PORT_DATA = "SET_PORT_DATA",
 	SET_NODE_COORDINATES = "SET_NODE_COORDINATES",
@@ -333,6 +334,11 @@ export type NodesAction =
 			nodeId: string;
 	  }
 	| {
+			type: NodesActionType.RENAME_NODE;
+			nodeId: string;
+			label: string;
+	  }
+	| {
 			type: NodesActionType.HYDRATE_DEFAULT_NODES;
 	  }
 	| {
@@ -447,6 +453,7 @@ const nodesReducer = (
 				x,
 				y,
 				type: nodeType,
+				label: nodeTypes[nodeType].label,
 				width: nodeTypes[nodeType].initialWidth || 200,
 				connections: {
 					inputs: {},
@@ -475,6 +482,17 @@ const nodesReducer = (
 		case NodesActionType.REMOVE_NODE: {
 			const { nodeId } = action;
 			return removeNode(nodes, nodeId);
+		}
+
+		case NodesActionType.RENAME_NODE: {
+			const { nodeId, label } = action;
+			return {
+				...nodes,
+				[nodeId]: {
+					...nodes[nodeId],
+					label: label.trim() || nodes[nodeId].label || nodeTypes[nodes[nodeId].type]?.label,
+				},
+			};
 		}
 
 		case NodesActionType.HYDRATE_DEFAULT_NODES: {

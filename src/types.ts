@@ -293,6 +293,7 @@ export type Connections = {
 export type FlumeNode = {
 	id: string;
 	type: string;
+	label?: string;
 	width: number;
 	x: number;
 	y: number;
@@ -367,6 +368,7 @@ export type CircularBehavior = "prevent" | "warn" | "allow";
 export type NodeHeaderActions = {
 	openMenu: (event: MouseEvent | React.MouseEvent) => void | any;
 	closeMenu: () => void | any;
+	renameNode: () => void | any;
 	deleteNode: () => void | any;
 };
 
@@ -374,6 +376,7 @@ export type NodeHeaderRenderCallback = (
 	Wrapper: React.FC<HTMLProps<HTMLHeadingElement>>,
 	nodeType: NodeType,
 	actions: NodeHeaderActions,
+	label?: string,
 ) => ReactNode;
 
 export type PortResolver = (

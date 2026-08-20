@@ -725,10 +725,10 @@ const App = () => {
 						y: -200,
 					},
 				]}
-				renderNodeHeader={(Wrapper, nodeType, actions) => {
+				renderNodeHeader={(Wrapper, nodeType, actions, nodeLabel) => {
 					return (
 						<Wrapper style={{ display: "flex" }}>
-							{nodeType.label}
+							{nodeLabel}
 							{nodeType.type === "employee" ? (
 								<button
 									style={{
