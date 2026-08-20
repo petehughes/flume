@@ -1,3 +1,5 @@
+import { NodeTypeMap, PortType, PortTypeMap } from '../types';
+
 export const exampleNodes = {
 	"5nCLb85WDw": {
 		id: "5nCLb85WDw",
@@ -40,7 +42,7 @@ export const exampleNodes = {
 	},
 };
 
-export const portTypes = {
+export const portTypes : PortTypeMap= {
 	number: {
 		label: "Number",
 		name: "number",
@@ -54,36 +56,47 @@ export const portTypes = {
 				defaultValue: 0,
 			},
 		],
-	},
+	} as PortType,
 };
 
-export const nodeTypes = {
+
+
+
+export const nodeTypes: NodeTypeMap = {
 	number: {
 		type: "number",
 		label: "Number",
+		addable:true,
+		deletable:true,
+		description:'',
+		id:"number",
 		initialWidth: 150,
-		inputs: [{ type: "number", name: "number" }],
+		inputs: [{  type: "number", name: "number" } as PortType],
 		outputs: [
 			{
 				type: "number",
 				name: "number",
-			},
+			} as PortType,
 		],
 	},
 	addNumbers: {
 		type: "addNumbers",
 		label: "Add Numbers",
+		addable:true,
+		deletable:true,
+		description:'',
+		id:"addNumber",
 		initialWidth: 150,
 		inputs: [
 			{
 				type: "number",
 				name: "num1",
-			},
+			} as PortType,
 			{
 				type: "number",
 				name: "num2",
-			},
+			} as PortType,
 		],
-		outputs: [{ type: "number", name: "result" }],
+		outputs: [{  type: "number", name: "result" } as PortType],
 	},
 };

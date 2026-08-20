@@ -75,7 +75,7 @@ const Subgraph = ({
 			data-subgraph-id={subgraph.id}
 			data-flume-component="subgraph"
 		>
-			<div className={styles.header} onContextMenu={handleHeaderContextMenu}>
+			<div className={styles.header} onContextMenu={handleHeaderContextMenu} data-flume-component="subgraph-header">
 				{subgraph.label}
 			</div>
 			{menuOpen ? (

@@ -1,6 +1,8 @@
+import { describe, expect, test, vi } from 'vitest'
 import { render } from "@testing-library/react";
 import React from "react";
-import { Colors, Controls, FlumeConfig, NodeEditor } from "../";
+import { Colors, Controls, FlumeConfig, NodeEditor } from "..";
+
 
 const config = new FlumeConfig()
 	.addPortType({
@@ -25,9 +27,9 @@ const config = new FlumeConfig()
 		type: "transputFromContext",
 		label: "From Context",
 		inputs: (ports) => (_, __, context) =>
-			context.transputs.map((id) => ports.text({ name: id, label: id })),
+			context.transputs.map((id:string) => ports.text({ name: id, label: id })),
 		outputs: (ports) => (_, __, context) =>
-			context.transputs.map((id) => ports.text({ name: id, label: id })),
+			context.transputs.map((id:string) => ports.text({ name: id, label: id })),
 	})
 	.addNodeType({
 		type: "transputFromText",
@@ -47,7 +49,7 @@ const config = new FlumeConfig()
 
 describe("Dynamic transputs", () => {
 	test("can be added and removed", () => {
-		const Editor = ({ transputs }) => (
+		const Editor = ({ transputs }: {transputs: string[]}) => (
 			<div style={{ width: 400, height: 400 }}>
 				<NodeEditor
 					nodes={{
@@ -70,10 +72,10 @@ describe("Dynamic transputs", () => {
 
 		const { rerender, container } = render(<Editor transputs={["one"]} />);
 
-		const select = (type, name) =>
+		const select = (type:string, name:string) =>
 			`[data-port-transput-type="${type}"][data-port-name="${name}"]`;
-		const input = (name) => container.querySelector(select("input", name));
-		const output = (name) => container.querySelector(select("output", name));
+		const input = (name:string) => container.querySelector(select("input", name));
+		const output = (name:string) => container.querySelector(select("output", name));
 
 		expect(input("one")).not.toBe(null);
 		expect(input("two")).toBe(null);
@@ -96,8 +98,8 @@ describe("Dynamic transputs", () => {
 	});
 
 	test("connections are destroyed when an input is removed", () => {
-		const onChange = jest.fn();
-		const Editor = ({ transputs }) => (
+		const onChange = vi.fn();
+		const Editor = ({ transputs }: {transputs: string[]}) => (
 			<div style={{ width: 400, height: 400 }}>
 				<NodeEditor
 					nodes={{
@@ -110,7 +112,7 @@ describe("Dynamic transputs", () => {
 							inputData: {},
 							connections: {
 								inputs: {},
-								outputs: { text: [{ nodeId: "a", portName: "one" }] },
+								outputs: { text: [{ nodeId: "a", portName: "one", portType: "text" }] },
 							},
 						},
 						a: {
@@ -121,7 +123,7 @@ describe("Dynamic transputs", () => {
 							width: 100,
 							inputData: {},
 							connections: {
-								inputs: { one: [{ nodeId: "t", portName: "text" }] },
+								inputs: { one: [{ nodeId: "t", portName: "text", portType: "text" }] },
 								outputs: {},
 							},
 						},
@@ -135,7 +137,7 @@ describe("Dynamic transputs", () => {
 		);
 
 		const { rerender, container } = render(<Editor transputs={["one"]} />);
-		const get = (id) => container.querySelector(`[data-connection-id="${id}"]`);
+		const get = (id:string) => container.querySelector(`[data-connection-id="${id}"]`);
 
 		expect(get("ttextaone")).not.toBe(null);
 		rerender(<Editor transputs={["zero", "one"]} />);
@@ -143,14 +145,14 @@ describe("Dynamic transputs", () => {
 		rerender(<Editor transputs={["zero"]} />);
 		expect(get("ttextaone")).toBe(null);
 
-		const lastCall = onChange.mock.calls.pop()[0];
+		const lastCall = onChange.mock.calls.pop()![0];
 		expect(lastCall.t.connections.outputs).toEqual({ text: [] });
 		expect(lastCall.a.connections.inputs).toEqual({});
 	});
 
 	test("connections are destroyed when an output is removed", () => {
-		const onChange = jest.fn();
-		const Editor = ({ transputs }) => (
+		const onChange = vi.fn();
+		const Editor = ({ transputs }: {transputs: string[]}) => (
 			<div style={{ width: 400, height: 400 }}>
 				<NodeEditor
 					nodes={{
@@ -162,7 +164,7 @@ describe("Dynamic transputs", () => {
 							width: 100,
 							inputData: {},
 							connections: {
-								inputs: { text: [{ nodeId: "a", portName: "one" }] },
+								inputs: { text: [{ nodeId: "a", portName: "one", portType: "text" }] },
 								outputs: {},
 							},
 						},
@@ -175,7 +177,7 @@ describe("Dynamic transputs", () => {
 							inputData: {},
 							connections: {
 								inputs: {},
-								outputs: { one: [{ nodeId: "t", portName: "text" }] },
+								outputs: { one: [{ nodeId: "t", portName: "text", portType: "text" }] },
 							},
 						},
 					}}
@@ -188,7 +190,7 @@ describe("Dynamic transputs", () => {
 		);
 
 		const { rerender, container } = render(<Editor transputs={["one"]} />);
-		const get = (id) => container.querySelector(`[data-connection-id="${id}"]`);
+		const get = (id:string) => container.querySelector(`[data-connection-id="${id}"]`);
 
 		expect(get("aonettext")).not.toBe(null);
 		rerender(<Editor transputs={["zero", "one"]} />);
@@ -196,14 +198,14 @@ describe("Dynamic transputs", () => {
 		rerender(<Editor transputs={["zero"]} />);
 		expect(get("aonettext")).toBe(null);
 
-		const lastCall = onChange.mock.calls.pop()[0];
+		const lastCall = onChange.mock.calls.pop()![0];
 		expect(lastCall.a.connections.outputs).toEqual({ one: [] });
 		expect(lastCall.t.connections.inputs).toEqual({});
 	});
 
 	test("supports removing transput with numeric name", () => {
-		const onChange = jest.fn();
-		const Editor = ({ transputs }) => (
+		const onChange = vi.fn();
+		const Editor = ({ transputs }: {transputs: string[]|number[]}) => (
 			<div style={{ width: 400, height: 400 }}>
 				<NodeEditor
 					nodes={{
@@ -216,7 +218,7 @@ describe("Dynamic transputs", () => {
 							inputData: {},
 							connections: {
 								inputs: {},
-								outputs: { text: [{ nodeId: "a", portName: "1" }] },
+								outputs: { text: [{ nodeId: "a", portName: "1", portType: "number" }] },
 							},
 						},
 						a: {
@@ -227,7 +229,7 @@ describe("Dynamic transputs", () => {
 							width: 100,
 							inputData: {},
 							connections: {
-								inputs: { 1: [{ nodeId: "t", portName: "text" }] },
+								inputs: { 1: [{ nodeId: "t", portName: "text", portType: "text" }] },
 								outputs: {},
 							},
 						},
@@ -241,19 +243,19 @@ describe("Dynamic transputs", () => {
 		);
 
 		const { rerender, container } = render(<Editor transputs={[1]} />);
-		const get = (id) => container.querySelector(`[data-connection-id="${id}"]`);
+		const get = (id:string) => container.querySelector(`[data-connection-id="${id}"]`);
 
 		expect(get("ttexta1")).not.toBe(null);
 		rerender(<Editor transputs={[]} />);
 		expect(get("ttexta1")).toBe(null);
 
-		const lastCall = onChange.mock.calls.pop()[0];
+		const lastCall = onChange.mock.calls.pop()![0];
 		expect(lastCall.t.connections.outputs).toEqual({ text: [] });
 		expect(lastCall.a.connections.inputs).toEqual({});
 	});
 
 	test("preserves dynamic inputData", () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const { getByText } = render(
 			<div style={{ width: 400, height: 400 }}>
 				<NodeEditor
@@ -287,7 +289,7 @@ describe("Dynamic transputs", () => {
 				/>
 			</div>,
 		);
-		const lastCall = onChange.mock.calls.pop()[0];
+		const lastCall = onChange.mock.calls.pop()![0];
 		expect(lastCall.a.inputData.one).toEqual({ text: "testing context" });
 		expect(lastCall.b.inputData.name).toEqual({ text: "two" });
 		expect(lastCall.b.inputData.two).toEqual({ text: "testing text" });

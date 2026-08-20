@@ -1,12 +1,12 @@
-import "expect-puppeteer";
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
-import { NodeEditor } from "../";
+import { NodeEditor } from "..";
 import { exampleNodes, nodeTypes, portTypes } from "./nodes";
 
-const CONSOLE_OUTPUT = [];
+const CONSOLE_OUTPUT: string[] = [];
 const Log = console.log;
-const mockedConsoleLog = (log) => CONSOLE_OUTPUT.unshift(log);
+const mockedConsoleLog = (log: string) => CONSOLE_OUTPUT.unshift(log);
 
 describe("<NodeEditor/>", () => {
 	test("Component is defined", () => {
@@ -38,14 +38,14 @@ describe("<Node/>", () => {
 				/>
 			</div>,
 		);
-		const numberNodeId = "vRPQ06k4nT";
+		const numberNodeId:string = "vRPQ06k4nT";
 		const numberNode = container.querySelector(
 			`[data-node-id="${numberNodeId}"] input`,
-		);
-		fireEvent.change(numberNode, { target: { value: "100" } });
-		expect(numberNode.value).toBe("100");
+		) as HTMLInputElement;
+		fireEvent.change(numberNode!, { target: { value: "100" } });
+		expect(numberNode!.value).toBe("100");
 		getByText("Log Nodes").click();
-		expect(CONSOLE_OUTPUT[0][numberNodeId].inputData.number.number).toBe(100);
+		expect((CONSOLE_OUTPUT[0] as any)[numberNodeId].inputData.number.number).toBe(100);
 	});
 
 	afterEach(() => (console.log = Log));

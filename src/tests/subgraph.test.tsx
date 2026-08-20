@@ -1,10 +1,11 @@
+import {  describe, expect, test, vi } from 'vitest'
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
 import { NodeEditor } from "../NodeEditor";
 import nodesReducer, { NodesActionType } from "../nodesReducer";
 import { exampleNodes, nodeTypes, portTypes } from "./nodes";
 
-const node = (id, x, y, connections = {}) => ({
+const node = (id:string, x:number, y:number, connections :{inputs?:{}, outputs?:{}}= {}) => ({
 	id,
 	type: "number",
 	width: 150,
@@ -60,9 +61,9 @@ describe("subgraphs", () => {
 			`[data-node-id="${nodeIds[1]}"]`,
 		);
 
-		fireEvent.mouseDown(firstNode);
-		fireEvent.mouseDown(secondNode, { shiftKey: true });
-		fireEvent.contextMenu(secondNode);
+		fireEvent.mouseDown(firstNode!);
+		fireEvent.mouseDown(secondNode!, { shiftKey: true });
+		fireEvent.contextMenu(secondNode!);
 		fireEvent.click(getByText("Create Subgraph"));
 
 		expect(
@@ -71,7 +72,7 @@ describe("subgraphs", () => {
 	});
 
 	test("moves member nodes while dragging a subgraph", () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const subgraphs = {
 			math: {
 				id: "math",
@@ -93,10 +94,12 @@ describe("subgraphs", () => {
 			/>,
 		);
 		const header = container.querySelector(
-			'[data-flume-component="subgraph"] .header',
+			'[data-flume-component="subgraph"] [data-flume-component="subgraph-header"]',
 		);
 
-		fireEvent.mouseDown(header, { clientX: 10, clientY: 10 });
+		expect(header).not.to.be.null;
+
+		fireEvent.mouseDown(header!, { clientX: 10, clientY: 10 });
 		fireEvent.mouseMove(document, { clientX: 20, clientY: 20 });
 		fireEvent.mouseMove(document, { clientX: 40, clientY: 50 });
 		fireEvent.mouseUp(document, { clientX: 40, clientY: 50 });
@@ -110,7 +113,7 @@ describe("subgraphs", () => {
 	});
 
 	test("expands a subgraph when a member moves outside its bounds", () => {
-		const onSubgraphsChange = jest.fn();
+		const onSubgraphsChange = vi.fn();
 		const { container } = render(
 			<NodeEditor
 				nodes={exampleNodes}
@@ -132,7 +135,7 @@ describe("subgraphs", () => {
 		);
 		const node = container.querySelector('[data-node-id="5nCLb85WDw"]');
 
-		fireEvent.mouseDown(node, { clientX: 0, clientY: 0 });
+		fireEvent.mouseDown(node!, { clientX: 0, clientY: 0 });
 		fireEvent.mouseMove(document, { clientX: 300, clientY: 200 });
 		fireEvent.mouseUp(document, { clientX: 300, clientY: 200 });
 
@@ -142,14 +145,14 @@ describe("subgraphs", () => {
 				height: expect.any(Number),
 			}),
 		});
-		const updatedSubgraph = onSubgraphsChange.mock.calls.at(-1)[0].math;
+		const updatedSubgraph = onSubgraphsChange.mock.calls.at(-1)![0].math;
 		expect(updatedSubgraph.x + updatedSubgraph.width).toBeGreaterThan(300);
 		expect(updatedSubgraph.y + updatedSubgraph.height).toBeGreaterThan(200);
 	});
 
 	test("renames a subgraph from its title context menu", () => {
-		const onSubgraphsChange = jest.fn();
-		const prompt = jest.spyOn(window, "prompt").mockReturnValue("Renamed Math");
+		const onSubgraphsChange = vi.fn();
+		const prompt = vi.spyOn(window, "prompt").mockReturnValue("Renamed Math");
 		const { container, getByText } = render(
 			<NodeEditor
 				nodes={exampleNodes}
@@ -170,13 +173,17 @@ describe("subgraphs", () => {
 			/>,
 		);
 
-		fireEvent.contextMenu(
-			container.querySelector('[data-flume-component="subgraph"] .header'),
+		const header = container.querySelector(
+			'[data-flume-component="subgraph"] [data-flume-component="subgraph-header"]',
 		);
+
+		expect(header).not.to.be.null;
+
+		fireEvent.contextMenu(header!);
 		fireEvent.click(getByText("Rename"));
 
 		expect(prompt).toHaveBeenCalledWith("Rename subgraph", "Math");
-		expect(container.querySelector(".header").textContent).toBe("Renamed Math");
+		expect(header!.textContent).toBe("Renamed Math");
 		expect(onSubgraphsChange).toHaveBeenCalledWith(
 			expect.objectContaining({
 				math: expect.objectContaining({ label: "Renamed Math" }),
@@ -186,7 +193,7 @@ describe("subgraphs", () => {
 	});
 
 	test("removes a subgraph while keeping its nodes", () => {
-		const onSubgraphsChange = jest.fn();
+		const onSubgraphsChange = vi.fn();
 		const { container, getByText } = render(
 			<NodeEditor
 				nodes={exampleNodes}
@@ -207,9 +214,13 @@ describe("subgraphs", () => {
 			/>,
 		);
 
-		fireEvent.contextMenu(
-			container.querySelector('[data-flume-component="subgraph"] .header'),
+		
+		const header = container.querySelector(
+			'[data-flume-component="subgraph"] [data-flume-component="subgraph-header"]',
 		);
+
+		expect(header).not.to.be.null;
+		fireEvent.contextMenu(header!);
 		fireEvent.click(getByText("Remove"));
 
 		expect(
@@ -225,7 +236,7 @@ describe("subgraphs", () => {
 	});
 
 	test("moves a dragged node between subgraphs", () => {
-		const onSubgraphsChange = jest.fn();
+		const onSubgraphsChange = vi.fn();
 		const { container } = render(
 			<NodeEditor
 				nodes={exampleNodes}
@@ -256,7 +267,7 @@ describe("subgraphs", () => {
 		);
 		const node = container.querySelector('[data-node-id="5nCLb85WDw"]');
 
-		fireEvent.mouseDown(node, { clientX: 0, clientY: 0 });
+		fireEvent.mouseDown(node!, { clientX: 0, clientY: 0 });
 		fireEvent.mouseMove(document, { clientX: 320, clientY: 320 });
 		fireEvent.mouseUp(document, { clientX: 320, clientY: 320 });
 
@@ -266,7 +277,7 @@ describe("subgraphs", () => {
 				nodeIds: expect.arrayContaining(["5nCLb85WDw", "vRPQ06k4nT"]),
 			}),
 		});
-		const updatedSubgraphs = onSubgraphsChange.mock.calls.at(-1)[0];
+		const updatedSubgraphs = onSubgraphsChange.mock.calls.at(-1)![0];
 		expect(updatedSubgraphs.destination.width).toBeGreaterThan(120);
 		expect(updatedSubgraphs.destination.height).toBeGreaterThan(150);
 	});
