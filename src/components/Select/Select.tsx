@@ -1,4 +1,4 @@
-import React from "react";
+import React, { RefObject } from "react";
 import { Portal } from "react-portal";
 import { SelectOption } from "../../types";
 import ContextMenu from "../ContextMenu/ContextMenu";
@@ -99,7 +99,7 @@ const Select = ({
 				) : null
 			) : data ? (
 				<SelectedOption
-					wrapperRef={wrapper}
+					wrapperRef={wrapper as  RefObject<HTMLDivElement>}
 					option={selectedOption}
 					onClick={openDrawer}
 				/>

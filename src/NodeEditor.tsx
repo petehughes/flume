@@ -97,7 +97,7 @@ export let NodeEditor = React.forwardRef(
 	) => {
 		const editorId = useId() ?? "";
 		const cache = React.useRef(new Cache());
-		const stage = React.useRef<DOMRect | undefined>();
+		const stage = React.useRef<DOMRect | undefined>(undefined);
 		const [sideEffectToasts, setSideEffectToasts] =
 			React.useState<ToastAction>();
 		const [toasts, dispatchToasts] = React.useReducer(toastsReducer, []);

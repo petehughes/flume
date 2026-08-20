@@ -35,7 +35,7 @@ const Draggable = ({
 	...rest
 }: DraggableProps) => {
 	const startCoordinates = React.useRef<Coordinate | null>(null);
-	const offset = React.useRef<Coordinate>();
+	const offset = React.useRef<Coordinate>({x:0, y:0});
 	const wrapper = React.useRef<HTMLDivElement | null>(null);
 
 	const byScale = (value: number) => (1 / stageState.scale) * value;

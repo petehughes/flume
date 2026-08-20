@@ -27,7 +27,7 @@ const Subgraph = ({
 	onRename,
 	onRemove,
 }: SubgraphProps) => {
-	const previousCoordinates = React.useRef<Coordinate>();
+	const previousCoordinates = React.useRef<Coordinate|undefined>(undefined);
 	const [menuOpen, setMenuOpen] = React.useState(false);
 	const [menuCoordinates, setMenuCoordinates] = React.useState({ x: 0, y: 0 });
 
