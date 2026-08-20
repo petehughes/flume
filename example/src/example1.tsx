@@ -1,5 +1,4 @@
 import React from "react";
-import "normalize.css";
 import {
 	Colors,
 	Controls,
@@ -689,7 +688,7 @@ const engine = new RootEngine(
 	},
 );
 
-const App = () => {
+export const Exmaple1 = () => {
 	const [nodes, setNodes] = React.useState({});
 	const [comments, setComments] = React.useState({});
 	const [editorKey, setEditorKey] = React.useState(0);
@@ -757,7 +756,6 @@ const App = () => {
 	);
 };
 
-export default App;
 
 const useInfiniteEngine = <T extends { [inputName: string]: any }>(
 	nodes: NodeMap,

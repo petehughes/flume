@@ -1,21 +1,34 @@
+import { Exmaple1 } from "./example1"
+import { Example2 } from "./example2"
+
+import "./index.module.css";
+
+import React from "react";
 import ReactDOM from "react-dom/client";
-//@ts-ignore next-line
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
-import App from "./App";
-import TestEditor from "./TestRoutes/TestEditor";
-import "./index.css";
+import { BrowserRouter, NavLink, Route, Routes } from "react-router";
 
-const rootElement = document.getElementById("root");
+const root = document.getElementById("root");
 
-if (rootElement) {
-	const root = ReactDOM.createRoot(rootElement);
+ReactDOM.createRoot(root!).render(
+	<BrowserRouter>
+	  {/* Navigation */}
+	  <nav>
+		<NavLink to="/">Home</NavLink> |{" "}
+		<NavLink to="/example1">Example 1</NavLink> |{" "}
+		<NavLink to="/example2">Example 2</NavLink>
+	  </nav>
+	 <body>
+	  {/* Routes */}
+	  <Routes>
+		<Route path="/" element={<Home />} />
+		<Route path="/example1" element={<Exmaple1 />} />
+		<Route path="/example2" element={<Example2 />} />
+	  </Routes>
+	  </body>
+	</BrowserRouter>
+);
 
-	root.render(
-		<Router>
-			<Route exact path="/" render={() => <App />} />
-			<Switch>
-				<Route exact path="/test" render={() => <TestEditor />} />
-			</Switch>
-		</Router>,
-	);
+
+function Home() {
+  return <h1>Home Page</h1>;
 }
