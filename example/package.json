@@ -25,10 +25,8 @@
 		"typescript": "^7.0.2"
 	},
 	"scripts": {
-		"start": "react-scripts start",
-		"build": "react-scripts build",
-		"test": "react-scripts test --env=jsdom",
-		"eject": "react-scripts eject",
+		"start": "vite dev",
+		"build": "vite build",
 		"docz:dev": "DOCZ_SOURCE=./src docz dev",
 		"docz:build": "DOCZ_SOURCE=./src docz build",
 		"docz:serve": "DOCZ_SOURCE=./src docz build && docz serve"
