@@ -1,4 +1,7 @@
 import React from "react";
+import style from "./index.module.css"
+
+
 import {
 	Colors,
 	Controls,
@@ -693,7 +696,7 @@ export const Exmaple1 = () => {
 	const [comments, setComments] = React.useState({});
 	const [editorKey, setEditorKey] = React.useState(0);
 	return (
-		<div className="wrapper" style={{ lineHeight: 1.8 }}>
+		<div className={style.wrapper} style={{ lineHeight: 1.8 }}>
 			<button
 				onClick={() => {
 					var output = prompt(
@@ -778,7 +781,7 @@ const Website = ({ nodes }: { nodes: NodeMap }) => {
 		}>(nodes, engine, { someContext: true }, { maxLoops: 10 });
 
 	return (
-		<div className="website-wrapper">
+		<div className={style.website}>
 			<h1>{title}</h1>
 			<p>{description}</p>
 			{showDashboard && <div>Dashboard</div>}

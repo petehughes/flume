@@ -26,6 +26,7 @@
 	"scripts": {
 		"start": "vite dev",
 		"build": "vite build",
+		"serve": "vite serve",
 		"docz:dev": "DOCZ_SOURCE=./src docz dev",
 		"docz:build": "DOCZ_SOURCE=./src docz build",
 		"docz:serve": "DOCZ_SOURCE=./src docz build && docz serve"

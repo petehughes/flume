@@ -2,6 +2,7 @@ import { Exmaple1 } from "./example1"
 import { Example2 } from "./example2"
 
 import "./index.module.css";
+import style from  "./index.module.css";
 
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -13,18 +14,16 @@ ReactDOM.createRoot(root!).render(
 	<BrowserRouter>
 	  {/* Navigation */}
 	  <nav>
-		<NavLink to="/">Home</NavLink> |{" "}
-		<NavLink to="/example1">Example 1</NavLink> |{" "}
-		<NavLink to="/example2">Example 2</NavLink>
+		<NavLink to="/" className={({isActive})=>{isActive? style.active: ""}} >Home</NavLink> |{" "}
+		<NavLink to="/example1" className={({isActive})=>{isActive? style.active: ""}}>Example 1</NavLink> |{" "}
+		<NavLink to="/example2" className={({isActive})=>{isActive? style.active: ""}}>Example 2</NavLink>
 	  </nav>
-	 <body>
 	  {/* Routes */}
 	  <Routes>
 		<Route path="/" element={<Home />} />
 		<Route path="/example1" element={<Exmaple1 />} />
 		<Route path="/example2" element={<Example2 />} />
 	  </Routes>
-	  </body>
 	</BrowserRouter>
 );
 

@@ -1,5 +1,5 @@
 import React from "react";
-
+import style from "./index.module.css"
 import { Controls, FlumeConfig, NodeEditor, NodeMap, NodeResolver, PortResolver, RootEngine } from "node-editor";
 
 
@@ -112,7 +112,7 @@ export const Example2 = () => {
 
 	}, [nodes]);
 	return (
-		<div className="wrapper example2" style={{ width: 800, height: 600 }}>
+		<div className={style.wrapper + " "+ style.example2} style={{ width: 800, height: 600 }}>
 			<NodeEditor
 				portTypes={config.portTypes}
 				nodeTypes={config.nodeTypes}
@@ -129,14 +129,14 @@ export const Example2 = () => {
 				]}
 				debug
 			/>
-			<div className="container">
-			<div id="INPUT">
+			<div className={style.container}>
+			<div id={style.INPUT}>
 				<h3>input</h3>
 				<pre>
 					{JSON.stringify(context)}
 				</pre>
 			</div>
-			<div id="OUTPUT">
+			<div id={style.OUTPUT}>
 				<h3>output</h3>
 				<pre>
 					{output}

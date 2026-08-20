@@ -1,13 +1,16 @@
 {
 	"compilerOptions": {
 		"outDir": "dist",
+		"rootDir": "src",
 		"module": "esnext",
 		"target": "esnext",
-		"lib": ["dom", "esnext"],
+		"lib": [
+			"dom",
+			"esnext"
+		],
 		"jsx": "react",
 		"declaration": true,
 		"declarationDir": ".",
-		"moduleResolution": "bundler",
 		"sourceMap": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
@@ -21,7 +24,6 @@
 		"strictPropertyInitialization": false,
 		"noImplicitThis": false,
 		"useUnknownInCatchVariables": false,
-		"noUnusedLocals": true,
 		"noUnusedParameters": false,
 		"exactOptionalPropertyTypes": false,
 		"noImplicitReturns": false,
@@ -32,6 +34,12 @@
 		"allowUnusedLabels": true,
 		"allowUnreachableCode": true
 	},
-	"exclude": ["dist"],
-	"include": ["./src/**/*.ts", "./src/**/*.tsx", "src/*.d.ts"]
+	"exclude": [
+		"dist"
+	],
+	"include": [
+		"./src/**/*.ts",
+		"./src/**/*.tsx",
+		"src/*.d.ts"
+	]
 }
